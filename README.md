@@ -71,12 +71,12 @@ For SQL only fixes, open a ticket; if a bug report exists for the bug, post on a
 > [!NOTE]
 > Useful information that users should know, even when skimming content.
 
-| Emulator                             | Status |
+| Content                              | Status |
 |--------------------------------------|:--------:|
-| Classic                              | [ ] |
-| TBC                                  | [ ] |
-| Wotlk                                | [ ] |
-| Cataclysm                            | [ ] |
-| Mists of Pandaria                    | [ ] |
-| Warlords of Draenor                  | [ ] |
-| Legion                               | [ ] |
+| Classic                              | ✅     |
+| TBC                                  | ❌     |
+| Wotlk                                | ❌     |
+| Cataclysm                            | ❌     |
+| Mists of Pandaria                    | ❌     |
+| Warlords of Draenor                  | ❌     |
+| Legion                               | ❌     |
