@@ -25,6 +25,11 @@
 #include <vector>
 #include <boost/iterator/reverse_iterator.hpp>
 
+#if TRINITY_COMPILER == TRINITY_COMPILER_GNU
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #define CHECK_AND_DECLARE_FUNCTION_TYPE(name, publicKey, privateKey)                                        \
     static_assert(std::is_same<decltype(&publicKey), decltype(&privateKey)>::value,                         \
         "Public key and private key functions must have the same signature");                               \
@@ -131,3 +136,7 @@ namespace Crypto
     template TC_COMMON_API bool RSA::Encrypt<RSA::PrivateKey>(uint8 const* data, std::size_t dataLength, uint8* output, int32 paddingType);
 }
 }
+
+#if TRINITY_COMPILER == TRINITY_COMPILER_GNU
+#pragma GCC diagnostic pop
+#endif

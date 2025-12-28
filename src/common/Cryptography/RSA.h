@@ -21,6 +21,11 @@
 #include <string>
 #include <type_traits>
 
+#if TRINITY_COMPILER == TRINITY_COMPILER_GNU
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 class BigNumber;
 
 namespace Trinity
@@ -76,3 +81,7 @@ private:
 };
 }
 }
+
+#if TRINITY_COMPILER == TRINITY_COMPILER_GNU
+#pragma GCC diagnostic pop
+#endif
