@@ -484,7 +484,7 @@ void ResourcesService::CallServerMethod(uint32 token, uint32 methodId, MessageBu
 }
 
 uint32 ResourcesService::HandleGetContentHandle(::bgs::protocol::resources::v1::ContentHandleRequest const* request, ::bgs::protocol::ContentHandle* response, std::function<void(ServiceBase*, uint32, ::google::protobuf::Message const*)>& continuation) {
-  TC_LOG_ERROR("service.protobuf", "%s Client tried to call not implemented method ResourcesService.GetContentHandle({ %s })",
+  TC_LOG_DEBUG("service.protobuf", "%s Client tried to call not implemented method ResourcesService.GetContentHandle({ %s })",
     GetCallerInfo().c_str(), request->ShortDebugString().c_str());
   return ERROR_RPC_NOT_IMPLEMENTED;
 }
