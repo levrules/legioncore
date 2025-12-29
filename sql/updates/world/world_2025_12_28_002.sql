@@ -1,0 +1,5 @@
+-- Remove creatures with entry 230000, 220011, 230005, 230007
+
+DELETE FROM `creature_template` WHERE `entry` IN (230000, 220011, 230005, 230007);
+DELETE FROM `creature` WHERE `id` IN (230000, 220011, 230005, 230007);
+DELETE FROM `creature_text` WHERE `CreatureID` IN (230000, 220011, 230005, 230007);
