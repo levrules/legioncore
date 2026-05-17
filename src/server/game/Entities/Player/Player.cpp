@@ -25079,6 +25079,10 @@ void Player::SaveToDB(bool create /*=false*/)
     stmt2->setString(4, GetName());
     stmt2->setUInt64(5, GetGUID().GetCounter());
     stmt2->setUInt32(6, GameTime::GetGameTime());
+    stmt2->setUInt8(7, getRace());
+    stmt2->setUInt8(8, getClass());
+    stmt2->setUInt8(9, getGender());
+    stmt2->setUInt8(10, getLevel());
     trans2->Append(stmt2);
 
     LoginDatabase.CommitTransaction(trans2);

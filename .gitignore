@@ -23,3 +23,7 @@ cmake-build-*/
 .vs
 *.user
 .cache/
+
+# custom 
+logs
+*.log

@@ -124,6 +124,7 @@ namespace WorldPackets
         class LogoutInstant;
         class LoadingScreenNotify;
         class GetUndeleteCharacterCooldownStatus;
+        class GetAccountCharacterList;
         class SetActionBarToggles;
         class RequestPlayedTime;
         class SetTitle;
@@ -1264,6 +1265,8 @@ class TC_GAME_API WorldSession
         void LogUnprocessedTail(WorldPacket const* packet);
 
         void HandleCharEnumOpcode(WorldPackets::Character::EnumCharacters& /*enumCharacters*/);
+        void HandleGetAccountCharacterList(WorldPackets::Character::GetAccountCharacterList& packet);
+        void SendAccountCharacterList(uint32 token, PreparedQueryResult charResult, PreparedQueryResult loginResult);
         void HandleCharDeleteOpcode(WorldPackets::Character::DeleteChar& charDelete);
         void HandleCharCreateOpcode(WorldPackets::Character::CreateChar& charCreate);
         void HandlePlayerLoginOpcode(WorldPackets::Character::PlayerLogin& playerLogin);

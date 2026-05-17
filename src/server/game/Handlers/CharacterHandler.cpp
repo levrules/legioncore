@@ -47,6 +47,8 @@
 #include "SocialMgr.h"
 #include "SystemPackets.h"
 #include "WorldStateMgr.h"
+#include "World.h"
+#include <unordered_set>
 
 void WorldSession::HandleCharEnum(PreparedQueryResult result, bool isDeleted)
 {
@@ -130,6 +132,101 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result, bool isDeleted)
 void WorldSession::HandleCharEnumOpcode(WorldPackets::Character::EnumCharacters& enumCharacters)
 {
     SendCharacterEnum(enumCharacters.GetOpcode() == CMSG_ENUM_CHARACTERS_DELETED_BY_CLIENT);
+}
+
+void WorldSession::HandleGetAccountCharacterList(WorldPackets::Character::GetAccountCharacterList& packet)
+{
+    uint32 const token = packet.Token;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_CHARACTER_LIST);
+    stmt->setUInt32(0, GetAccountId());
+
+    auto charResultHolder = std::make_shared<PreparedQueryResult>();
+
+    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
+        .WithChainingPreparedCallback([this, token, charResultHolder](QueryCallback& queryCallback, PreparedQueryResult result)
+    {
+        *charResultHolder = result;
+
+        LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BNET_LAST_PLAYER_CHARACTERS);
+        loginStmt->setUInt32(0, GetAccountId());
+        queryCallback.SetNextQuery(LoginDatabase.AsyncQuery(loginStmt));
+    })
+        .WithPreparedCallback([this, token, charResultHolder](PreparedQueryResult loginResult)
+    {
+        SendAccountCharacterList(token, *charResultHolder, loginResult);
+    }));
+}
+
+void WorldSession::SendAccountCharacterList(uint32 token, PreparedQueryResult charResult, PreparedQueryResult loginResult)
+{
+    using AccountCharacterInfo = WorldPackets::Character::GetAccountCharacterListResult::AccountCharacterInfo;
+
+    std::unordered_set<uint64> seenGuids;
+    seenGuids.reserve(16);
+
+    WorldPackets::Character::GetAccountCharacterListResult result;
+    result.Token = token;
+    result.ConsoleCommand = false;
+
+    uint32 const currentRealmId = realm.Id.Realm;
+    uint32 const currentVirtualRealm = GetVirtualRealmAddress();
+    std::string const currentRealmName = sObjectMgr->GetRealmName(currentRealmId);
+
+    if (charResult)
+    {
+        do
+        {
+            Field* fields = charResult->Fetch();
+
+            AccountCharacterInfo info;
+            info.WowAccountGuid = GetAccountGUID();
+            info.CharacterGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt64());
+            info.VirtualRealmAddress = currentVirtualRealm;
+            info.Race = fields[2].GetUInt8();
+            info.Class = fields[3].GetUInt8();
+            info.Sex = fields[4].GetUInt8();
+            info.Level = fields[5].GetUInt8();
+            info.LastActiveTime = fields[6].GetUInt32();
+            info.Name = fields[1].GetString();
+            info.RealmName = currentRealmName;
+
+            if (seenGuids.insert(info.CharacterGuid.GetCounter()).second)
+                result.Characters.push_back(std::move(info));
+        } while (charResult->NextRow());
+    }
+
+    if (loginResult)
+    {
+        do
+        {
+            Field* fields = loginResult->Fetch();
+
+            uint32 const realmId = fields[3].GetUInt32();
+            if (realmId == currentRealmId)
+                continue;
+
+            ObjectGuid const characterGuid = ObjectGuid::Create<HighGuid::Player>(fields[5].GetUInt64());
+            if (!seenGuids.insert(characterGuid.GetCounter()).second)
+                continue;
+
+            AccountCharacterInfo info;
+            info.WowAccountGuid = GetAccountGUID();
+            info.CharacterGuid = characterGuid;
+            info.VirtualRealmAddress = Battlenet::RealmHandle(fields[1].GetUInt8(), fields[2].GetUInt8(), realmId).GetAddress();
+            info.Race = fields[7].GetUInt8();
+            info.Class = fields[8].GetUInt8();
+            info.Sex = fields[9].GetUInt8();
+            info.Level = fields[10].GetUInt8();
+            info.LastActiveTime = fields[6].GetUInt32();
+            info.Name = fields[4].GetString();
+            info.RealmName = sObjectMgr->GetRealmName(realmId);
+
+            result.Characters.push_back(std::move(info));
+        } while (loginResult->NextRow());
+    }
+
+    SendPacket(result.Write());
 }
 
 void WorldSession::SendCharacterEnum(bool deleted /*= false*/)

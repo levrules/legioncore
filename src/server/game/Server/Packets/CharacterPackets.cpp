@@ -677,6 +677,46 @@ WorldPacket const* WorldPackets::Character::KickReason::Write()
     return &_worldPacket;
 }
 
+void WorldPackets::Character::GetAccountCharacterList::Read()
+{
+    _worldPacket >> Token;
+}
+
+ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Character::GetAccountCharacterListResult::AccountCharacterInfo const& charInfo)
+{
+    data << charInfo.WowAccountGuid;
+    data << charInfo.CharacterGuid;
+    data << charInfo.VirtualRealmAddress;
+    data << charInfo.Race;
+    data << charInfo.Class;
+    data << charInfo.Sex;
+    data << charInfo.Level;
+    data << charInfo.LastActiveTime;
+
+    data.WriteBits(charInfo.Name.length(), 6);
+    data.WriteBits(charInfo.RealmName.length(), 9);
+    data.FlushBits();
+
+    data.WriteString(charInfo.Name);
+    data.WriteString(charInfo.RealmName);
+
+    return data;
+}
+
+WorldPacket const* WorldPackets::Character::GetAccountCharacterListResult::Write()
+{
+    _worldPacket << Token;
+    _worldPacket << uint32(Characters.size());
+
+    _worldPacket.WriteBit(ConsoleCommand);
+    _worldPacket.FlushBits();
+
+    for (AccountCharacterInfo const& charInfo : Characters)
+        _worldPacket << charInfo;
+
+    return &_worldPacket;
+}
+
 void WorldPackets::Character::EngineSurvey::Read()
 {
     _worldPacket >> TotalPhysMemory;

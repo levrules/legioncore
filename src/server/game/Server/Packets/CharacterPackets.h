@@ -350,6 +350,42 @@ namespace WorldPackets
             uint32 CurrentCooldown = 0;
         };
 
+        class GetAccountCharacterList final : public ClientPacket
+        {
+        public:
+            GetAccountCharacterList(WorldPacket&& packet) : ClientPacket(CMSG_GET_ACCOUNT_CHARACTER_LIST, std::move(packet)) { }
+
+            void Read() override;
+
+            uint32 Token = 0;
+        };
+
+        class GetAccountCharacterListResult final : public ServerPacket
+        {
+        public:
+            struct AccountCharacterInfo
+            {
+                ObjectGuid WowAccountGuid;
+                ObjectGuid CharacterGuid;
+                uint32 VirtualRealmAddress = 0;
+                uint8 Race = 0;
+                uint8 Class = 0;
+                uint8 Sex = 0;
+                uint8 Level = 0;
+                uint64 LastActiveTime = 0;
+                std::string Name;
+                std::string RealmName;
+            };
+
+            GetAccountCharacterListResult() : ServerPacket(SMSG_GET_ACCOUNT_CHARACTER_LIST_RESULT, 20) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 Token = 0;
+            bool ConsoleCommand = false;
+            std::vector<AccountCharacterInfo> Characters;
+        };
+
         class PlayerLogin final : public ClientPacket
         {
         public:

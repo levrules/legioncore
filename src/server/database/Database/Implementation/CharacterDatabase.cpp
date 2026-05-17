@@ -856,6 +856,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_KILL_CREATURE, "UPDATE character_stat_kill_creature SET count = ?, point = ? WHERE guid = ? AND entry = ?", CONNECTION_ASYNC);
 
     PrepareStatement(CHAR_SEL_NUM_ACCOUNT_CHARS_REACHED_LEVEL, "SELECT COUNT(guid) FROM characters WHERE account = ? AND level >= ?", CONNECTION_BOTH);
+    PrepareStatement(CHAR_SEL_ACCOUNT_CHARACTER_LIST, "SELECT guid, name, race, class, gender, level, logout_time FROM characters WHERE account = ? AND deleteDate IS NULL", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo, ConnectionFlags connectionFlags) : MySQLConnection(connInfo, connectionFlags)
