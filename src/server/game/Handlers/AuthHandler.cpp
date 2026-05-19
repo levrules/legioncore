@@ -161,3 +161,8 @@ void WorldSession::HandleCheckVeteranTokenEligibility(WorldPackets::Token::Check
     result.UnkInt2 = 1;
     SendPacket(result.Write());
 }
+
+void WorldSession::HandleQueuedMessagesEnd(WorldPackets::Auth::QueuedMessagesEnd& packet)
+{
+    HandleTimeSync(SPECIAL_RESUME_COMMS_TIME_SYNC_COUNTER, packet.Timestamp);
+}

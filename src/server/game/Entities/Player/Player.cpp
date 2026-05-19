@@ -29658,6 +29658,9 @@ void Player::SendInitialPacketsBeforeAddToMap(bool login)
     {
         m_sequenceIndex = 0;
         ResetTimeSync();
+
+        if (uint32 resumeCommsTime = GetSession()->TakeResumeCommsClientTimestamp())
+            m_timeSyncClient = resumeCommsTime;
     }
 
     SendTimeSync();

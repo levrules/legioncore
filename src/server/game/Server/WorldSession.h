@@ -152,6 +152,8 @@ namespace WorldPackets
         class UpdateClientSettings;
         class SaveClientVariables;
         class GetRemainingGameTime;
+        class ReportEnabledAddons;
+        class ReportKeybindingExecutionCounts;
     }
 
     namespace Channel
@@ -671,6 +673,7 @@ namespace WorldPackets
     namespace Auth
     {
         enum class ConnectToSerial : uint32;
+        class QueuedMessagesEnd;
     }
 
     namespace Bank
@@ -1095,6 +1098,11 @@ class TC_GAME_API WorldSession
         uint8 GetAccountExpansion() const { return m_accountExpansion; }
         ObjectGuid GetBattlenetAccountGUID() const;
         Player* GetPlayer() const { return _player; }
+
+        static constexpr uint32 SPECIAL_RESUME_COMMS_TIME_SYNC_COUNTER = 0xFFFFFFFE;
+
+        void RegisterTimeSync(uint32 counter);
+        uint32 TakeResumeCommsClientTimestamp();
         std::string GetPlayerName(bool simple = true) const;
         std::string GetPlayerInfo() const;
 
@@ -1374,6 +1382,10 @@ class TC_GAME_API WorldSession
         void HandleUpdateClientSettings(WorldPackets::ClientConfig::UpdateClientSettings& packet);
         void HandleGetRemainingGameTime(WorldPackets::ClientConfig::GetRemainingGameTime& packet);
         void HandleSaveClientVariables(WorldPackets::ClientConfig::SaveClientVariables& packet);
+        void HandleReportEnabledAddons(WorldPackets::ClientConfig::ReportEnabledAddons& packet);
+        void HandleReportKeybindingExecutionCounts(WorldPackets::ClientConfig::ReportKeybindingExecutionCounts& packet);
+        void HandleQueuedMessagesEnd(WorldPackets::Auth::QueuedMessagesEnd& packet);
+        void HandleTimeSync(uint32 counter, uint32 clientTime);
 
         void HandleSetActionButtonOpcode(WorldPackets::Spells::SetActionButton& packet);
         
@@ -2125,6 +2137,14 @@ class TC_GAME_API WorldSession
         uint32 _tutorials[MAX_ACCOUNT_TUTORIAL_VALUES];
         uint8 _tutorialsChanged;
         AddonsList m_addonsList;
+        struct ReportedAddonInfo
+        {
+            std::string Name;
+            std::string Version;
+            bool Loaded = false;
+            bool Disabled = false;
+        };
+        std::vector<ReportedAddonInfo> _enabledAddonsReport;
         std::vector<std::string> _registeredAddonPrefixes;
         bool _filterAddonMessages;
         uint32 recruiterId;
@@ -2144,6 +2164,9 @@ class TC_GAME_API WorldSession
 
         ConnectToKey _instanceConnectKey;
         CharacterTemplateDataMap charTemplateData;
+
+        std::map<uint32, uint32> _pendingTimeSyncRequests;
+        uint32 _resumeCommsClientTimestamp = 0;
 
         bool canLogout;
         float PersonalXPRate = 0;

@@ -116,3 +116,41 @@ void WorldPackets::ClientConfig::GetRemainingGameTime::Read()
 {
     _worldPacket >> Time;
 }
+
+void WorldPackets::ClientConfig::ReportEnabledAddons::Read()
+{
+    uint32 count = _worldPacket.read<uint32>();
+    Addons.resize(count);
+    for (AddonInfo& addon : Addons)
+    {
+        _worldPacket.ResetBitReader();
+
+        uint32 nameLen = _worldPacket.ReadBits(7);
+        uint32 versionLen = _worldPacket.ReadBits(6);
+        addon.Loaded = _worldPacket.ReadBit();
+        addon.Disabled = _worldPacket.ReadBit();
+
+        if (nameLen > 1)
+            addon.Name = _worldPacket.ReadString(nameLen);
+        if (versionLen > 1)
+            addon.Version = _worldPacket.ReadString(versionLen);
+    }
+}
+
+void WorldPackets::ClientConfig::ReportKeybindingExecutionCounts::Read()
+{
+    uint32 count = _worldPacket.ReadBits(10);
+    _worldPacket.ResetBitReader();
+
+    KeyBindings.resize(count);
+    for (KeybindingInfo& keybinding : KeyBindings)
+    {
+        uint32 keyLen = _worldPacket.ReadBits(6);
+        uint32 actionLen = _worldPacket.ReadBits(6);
+        _worldPacket.ResetBitReader();
+
+        _worldPacket >> keybinding.ExecutionCount;
+        keybinding.Key = _worldPacket.ReadString(keyLen);
+        keybinding.Action = _worldPacket.ReadString(actionLen);
+    }
+}

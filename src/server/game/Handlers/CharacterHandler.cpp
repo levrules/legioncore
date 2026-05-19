@@ -2102,6 +2102,9 @@ void WorldSession::HandleContinuePlayerLogin()
 
     SendPacket(WorldPackets::Auth::ResumeComms(CONNECTION_TYPE_INSTANCE).Write());
 
+    // client will respond to SMSG_RESUME_COMMS with CMSG_QUEUED_MESSAGES_END
+    RegisterTimeSync(SPECIAL_RESUME_COMMS_TIME_SYNC_COUNTER);
+
     AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase const& holder)
     {
         HandlePlayerLogin(dynamic_cast<LoginQueryHolder const&>(holder));

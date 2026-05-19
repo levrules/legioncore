@@ -344,3 +344,8 @@ void WorldPackets::Auth::WardenData::Read()
     }
 }
 
+void WorldPackets::Auth::QueuedMessagesEnd::Read()
+{
+    _worldPacket >> Timestamp;
+}
+

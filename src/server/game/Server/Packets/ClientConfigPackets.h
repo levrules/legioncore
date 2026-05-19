@@ -159,6 +159,41 @@ namespace WorldPackets
             
             uint32 Time = 0;
         };
+
+        class ReportEnabledAddons final : public ClientPacket
+        {
+        public:
+            struct AddonInfo
+            {
+                std::string Name;
+                std::string Version;
+                bool Loaded = false;
+                bool Disabled = false;
+            };
+
+            ReportEnabledAddons(WorldPacket&& packet) : ClientPacket(CMSG_REPORT_ENABLED_ADDONS, std::move(packet)) { }
+
+            void Read() override;
+
+            std::vector<AddonInfo> Addons;
+        };
+
+        class ReportKeybindingExecutionCounts final : public ClientPacket
+        {
+        public:
+            struct KeybindingInfo
+            {
+                uint32 ExecutionCount = 0;
+                std::string Key;
+                std::string Action;
+            };
+
+            ReportKeybindingExecutionCounts(WorldPacket&& packet) : ClientPacket(CMSG_REPORT_KEYBINDING_EXECUTION_COUNTS, std::move(packet)) { }
+
+            void Read() override;
+
+            std::vector<KeybindingInfo> KeyBindings;
+        };
     }
 }
 

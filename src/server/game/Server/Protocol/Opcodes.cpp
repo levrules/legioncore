@@ -740,7 +740,7 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_QUEST_LOG_REMOVE_QUEST,                             STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleQuestLogRemoveQuest);
     DEFINE_HANDLER(CMSG_QUEST_POI_QUERY,                                    STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleQuestPOIQuery);
     DEFINE_HANDLER(CMSG_QUEST_PUSH_RESULT,                                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleQuestPushResult);
-    DEFINE_HANDLER(CMSG_QUEUED_MESSAGES_END,                                STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_QUEUED_MESSAGES_END,                                STATUS_AUTHED,    PROCESS_INPLACE,      &WorldSession::HandleQueuedMessagesEnd);
     DEFINE_HANDLER(CMSG_QUICK_JOIN_AUTO_ACCEPT_REQUESTS,                    STATUS_AUTHED,    PROCESS_THREADUNSAFE, &WorldSession::HandleQuickJoinAutoAcceptRequests);
     DEFINE_HANDLER(CMSG_QUICK_JOIN_REQUEST_INVITE,                          STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleQuickJoinRequestInvite);
     DEFINE_HANDLER(CMSG_QUICK_JOIN_RESPOND_TO_INVITE,                       STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleQuickJoinRespondToInvite);
@@ -759,8 +759,8 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_REPLACE_TROPHY,                                     STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleTrophyData);
     DEFINE_HANDLER(CMSG_REPOP_REQUEST,                                      STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleRepopRequest);
     DEFINE_HANDLER(CMSG_REPORT_CLIENT_VARIABLES,                            STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleSaveClientVariables);
-    DEFINE_HANDLER(CMSG_REPORT_ENABLED_ADDONS,                              STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_REPORT_KEYBINDING_EXECUTION_COUNTS,                 STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_REPORT_ENABLED_ADDONS,                              STATUS_AUTHED,    PROCESS_INPLACE,      &WorldSession::HandleReportEnabledAddons);
+    DEFINE_HANDLER(CMSG_REPORT_KEYBINDING_EXECUTION_COUNTS,                 STATUS_AUTHED,    PROCESS_INPLACE,      &WorldSession::HandleReportKeybindingExecutionCounts);
     DEFINE_HANDLER(CMSG_REPORT_PVP_PLAYER_AFK,                              STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleReportPvPPlayerAFK);
     DEFINE_HANDLER(CMSG_REQUEST_ACCOUNT_DATA,                               STATUS_AUTHED,    PROCESS_THREADUNSAFE, &WorldSession::HandleRequestAccountData);
     DEFINE_HANDLER(CMSG_REQUEST_AREA_POI_UPDATE,                            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleRequestAreaPoiUpdate);

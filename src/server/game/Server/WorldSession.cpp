@@ -1480,3 +1480,24 @@ void WorldSession::BanListHelper(PreparedQueryResult result)
 
     return;
 }
+
+void WorldSession::RegisterTimeSync(uint32 counter)
+{
+    _pendingTimeSyncRequests[counter] = getMSTime();
+}
+
+void WorldSession::HandleTimeSync(uint32 counter, uint32 clientTime)
+{
+    if (!_pendingTimeSyncRequests.erase(counter))
+        return;
+
+    if (counter == SPECIAL_RESUME_COMMS_TIME_SYNC_COUNTER)
+        _resumeCommsClientTimestamp = clientTime;
+}
+
+uint32 WorldSession::TakeResumeCommsClientTimestamp()
+{
+    uint32 const timestamp = _resumeCommsClientTimestamp;
+    _resumeCommsClientTimestamp = 0;
+    return timestamp;
+}

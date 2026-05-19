@@ -90,5 +90,18 @@ void WorldSession::HandleUpdateClientSettings(WorldPackets::ClientConfig::Update
 void WorldSession::HandleSaveClientVariables(WorldPackets::ClientConfig::SaveClientVariables& /*packet*/)
 { }
 
+void WorldSession::HandleReportEnabledAddons(WorldPackets::ClientConfig::ReportEnabledAddons& packet)
+{
+    _enabledAddonsReport.clear();
+    _enabledAddonsReport.reserve(packet.Addons.size());
+    for (WorldPackets::ClientConfig::ReportEnabledAddons::AddonInfo const& addon : packet.Addons)
+        _enabledAddonsReport.push_back({ addon.Name, addon.Version, addon.Loaded, addon.Disabled });
+}
+
+void WorldSession::HandleReportKeybindingExecutionCounts(WorldPackets::ClientConfig::ReportKeybindingExecutionCounts& /*packet*/)
+{
+    // retail: client telemetry only, no server response or persistence
+}
+
 void WorldSession::HandleGetRemainingGameTime(WorldPackets::ClientConfig::GetRemainingGameTime& /*packet*/)
 { }
